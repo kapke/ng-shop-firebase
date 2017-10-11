@@ -4,6 +4,7 @@ import { List } from 'immutable';
 
 import { ProductRepository } from './ProductRepository';
 import { Product } from './Product';
+import { trigger, state, style, transition, animate } from '@angular/animations';
 
 @Component({
     selector: 'dms-root',
@@ -12,7 +13,10 @@ import { Product } from './Product';
         <div class="products">
             <dms-product
                 *ngFor="let product of products$ | async; trackBy: productId"
-                [product]="product"></dms-product>
+                [@slide]="'in'"
+                [product]="product">
+                <button mat-button (click)="deleteProduct(product)">Delete</button>
+            </dms-product>
         </div>
     `,
     styles: [`
@@ -28,17 +32,29 @@ import { Product } from './Product';
             flex-wrap: wrap;
         }
     `],
+    animations: [
+        trigger('slide', [
+            state('in', style({
+                opacity: 1,
+                transform: 'translateY(0)'
+            })),
+            transition(':enter', [style({opacity: 0, transform: 'translateY(-100%)'}), animate('200ms ease-in')]),
+            transition(':leave', [animate('200ms ease-in', style({opacity: 0, transform: 'translateY(100%)'}) ), ]),
+        ])
+    ]
 })
 export class AppComponent {
     public products$: Observable<List<Product>>;
 
     constructor (private productRepository: ProductRepository) {
         this.products$ = this.productRepository.fancyFindAll().concat(this.productRepository.productList$);
-
-        this.products$.subscribe(products => console.log(products), null, () => console.log('complete'));
     }
 
     public productId (index: number, product: Product): string {
         return product.id;
+    }
+
+    public deleteProduct (product: Product): void {
+        this.productRepository.delete(product);
     }
 }

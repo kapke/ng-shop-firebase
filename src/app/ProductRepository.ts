@@ -13,6 +13,7 @@ export abstract class ProductRepository {
     abstract simpleFindAll (): Observable<List<Product>>;
     abstract fancyFindAll (): Observable<List<Product>>;
     abstract add (product: Product): Observable<Product>;
+    abstract delete (product: Product): void;
 }
 
 @Injectable()
@@ -24,7 +25,7 @@ export class HttpFireBaseProductRepository extends ProductRepository {
     }
 
     simpleFindAll (): Observable<List<Product>> {
-        return this.http.get('https://shining-torch-4509.firebaseio.com/products.json')
+        return this.http.get(this.getUrl())
             .map(res => res.json())
             .map(data => Object.keys(data)
                 .map(id => new Product({id, ...data[id]})))
@@ -35,7 +36,7 @@ export class HttpFireBaseProductRepository extends ProductRepository {
         return this.simpleFindAll()
             .switchMap(products => Observable
                 .from(products.toArray())
-                .concatMap(product => Observable.of(product).delay(10)))
+                .concatMap(product => Observable.of(product).delay(50)))
             .scan((list: List<Product>, product: Product) => list.concat(product), List<Product>());
     }
 
@@ -43,7 +44,7 @@ export class HttpFireBaseProductRepository extends ProductRepository {
         const data = {...product, id: undefined};
 
         const headers = new Headers({ 'Content-Type': 'application/json' });
-        const observable = this.http.post('https://shining-torch-4509.firebaseio.com/products.json', data, new RequestOptions({ headers }));
+        const observable = this.http.post(this.getUrl(), data, new RequestOptions({ headers }));
 
         return observable
             .map(res => res.json())
@@ -51,7 +52,17 @@ export class HttpFireBaseProductRepository extends ProductRepository {
             .do(() => this.emitNewProductList());
     }
 
+    delete (product: Product): void {
+        this.http.delete(this.getUrl(product.id))
+            .subscribe(() => this.emitNewProductList());
+    }
+
     private emitNewProductList (): void {
         this.simpleFindAll().subscribe(products => this.productList$.next(products));
+    }
+
+    private getUrl (id?: string): string {
+        const idPart = id ? '/' + id : '';
+        return `https://shining-torch-4509.firebaseio.com/products${idPart}.json`;
     }
 }

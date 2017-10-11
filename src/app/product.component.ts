@@ -11,6 +11,9 @@ import { Product } from './Product';
             <img mat-card-image [src]="product.imageUrl" (load)="imageLoaded()">
             <mat-card-title>{{ product.name }}</mat-card-title>
             <mat-card-subtitle>{{ product.price | currency }}</mat-card-subtitle>
+            <mat-card-actions>
+                <ng-content></ng-content>
+            </mat-card-actions>
         </mat-card>
     `,
     styles: [`
