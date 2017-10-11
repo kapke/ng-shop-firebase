@@ -1,28 +1,28 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-import { Product, ProductData } from './Product';
+import { Product } from './Product';
 
 
 @Component({
     selector: 'dms-product-form',
     template: `
         <form [formGroup]="form" (ngSubmit)="submitForm()">
-            <md-input-container>
+            <mat-input-container>
                 <label>Name</label>
-                <input mdInput type="text" [formControlName]="'name'" />
-            </md-input-container>
-            <md-input-container>
+                <input matInput type="text" [formControlName]="'name'" />
+            </mat-input-container>
+            <mat-input-container>
                 <label>Price</label>
-                <input mdInput type="number" min="0" [formControlName]="'price'" />
-            </md-input-container>
-            <md-input-container>
+                <input matInput type="number" min="0" [formControlName]="'price'" />
+            </mat-input-container>
+            <mat-input-container>
                 <label>Image URL</label>
-                <input mdInput type="url" [formControlName]="'imageUrl'" />
-            </md-input-container>
+                <input matInput type="url" [formControlName]="'imageUrl'" />
+            </mat-input-container>
             <div>
-                <button type="reset" md-button>Reset</button>
-                <button type="submit" md-button [disabled]="form.invalid">{{ submitButtonText }}</button>
+                <button type="reset" mat-button>Reset</button>
+                <button type="submit" mat-button [disabled]="form.invalid">{{ submitButtonText }}</button>
             </div>
         </form>
     `
@@ -43,7 +43,7 @@ export class ProductFormComponent {
 
     public submitForm () {
         if (this.form.valid) {
-            this.formSubmit.next(new Product(this.form.value as ProductData));
+            this.formSubmit.next(new Product(this.form.value));
         }
     }
 }

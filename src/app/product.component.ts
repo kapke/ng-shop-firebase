@@ -7,28 +7,30 @@ import { Product } from './Product';
 @Component({
     selector: 'dms-product',
     template: `
-        <md-card [@state]="state">
-            <md-card-title>{{ product.name }}</md-card-title>
-            <md-card-subtitle>{{ product.price | currency }}</md-card-subtitle>
-            <img md-card-image [src]="product.imageUrl" (load)="imageLoaded()">
-        </md-card>
+        <mat-card [@state]="state">
+            <img mat-card-image [src]="product.imageUrl" (load)="imageLoaded()">
+            <mat-card-title>{{ product.name }}</mat-card-title>
+            <mat-card-subtitle>{{ product.price | currency }}</mat-card-subtitle>
+        </mat-card>
     `,
     styles: [`
-        md-card {
+        :host {
+            margin: 1em;
+            display: block;
+        }
+        
+        mat-card {
             width: 300px;
             overflow: hidden;
         }
     `],
     animations: [
         trigger('state', [
-            state('unloaded', style({
-                backgroundColor: 'red',
-                height: 0,
-                padding: 0,
-            })),
-            state('loaded', style({
-            })),
-            transition('unloaded => loaded', animate('1000ms ease-in')),
+            state('loaded',
+                style({height: '*'})),
+            state('unloaded',
+                style({height: 0})),
+            transition('unloaded => loaded', [animate('1000ms ease-in')]),
         ])
     ]
 })

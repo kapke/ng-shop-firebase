@@ -1,27 +1,38 @@
 import { Component } from '@angular/core';
-import { ProductRepository } from './ProductRepository';
-import { Observable } from 'rxjs';
+import { Observable } from 'rxjs/Observable';
 import { List } from 'immutable';
+
+import { ProductRepository } from './ProductRepository';
 import { Product } from './Product';
 
 @Component({
     selector: 'dms-root',
     template: `
-        <dms-product *ngFor="let product of products | async" [product]="product"></dms-product>
         <dms-new-product-form></dms-new-product-form>
+        <div class="products">
+            <dms-product *ngFor="let product of products | async" [@product]="product" [product]="product"></dms-product>
+        </div>
     `,
     styles: [`
         :host {
             display: flex;
+            flex-direction: column;
+            flex-wrap: wrap;
+        }
+        
+        .products {
+            display: flex;
             flex-direction: row;
             flex-wrap: wrap;
         }
-    `]
+    `],
 })
 export class AppComponent {
     public products: Observable<List<Product>>;
 
     constructor (private productRepository: ProductRepository) {
-        this.products = this.productRepository.findAll();
+        this.products = this.productRepository.fancyFindAll();
+
+        this.products.subscribe(null, null, () => console.log('complete'))
     }
 }
