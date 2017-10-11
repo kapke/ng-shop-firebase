@@ -8,7 +8,7 @@ import { Product } from './Product';
 
 
 export abstract class ProductRepository {
-    abstract productListChange$: Observable<List<Product>>;
+    abstract productList$: Observable<List<Product>>;
 
     abstract simpleFindAll (): Observable<List<Product>>;
     abstract fancyFindAll (): Observable<List<Product>>;
@@ -17,7 +17,7 @@ export abstract class ProductRepository {
 
 @Injectable()
 export class HttpFireBaseProductRepository extends ProductRepository {
-    productListChange$: Subject<List<Product>> = new Subject();
+    productList$: Subject<List<Product>> = new Subject();
 
     constructor (private http: Http) {
         super();
@@ -35,7 +35,7 @@ export class HttpFireBaseProductRepository extends ProductRepository {
         return this.simpleFindAll()
             .switchMap(products => Observable
                 .from(products.toArray())
-                .concatMap(product => Observable.of(product).delay(100)))
+                .concatMap(product => Observable.of(product).delay(10)))
             .scan((list: List<Product>, product: Product) => list.concat(product), List<Product>());
     }
 
@@ -52,6 +52,6 @@ export class HttpFireBaseProductRepository extends ProductRepository {
     }
 
     private emitNewProductList (): void {
-        this.simpleFindAll().subscribe(this.productListChange$);
+        this.simpleFindAll().subscribe(products => this.productList$.next(products));
     }
 }

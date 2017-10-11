@@ -10,7 +10,9 @@ import { Product } from './Product';
     template: `
         <dms-new-product-form></dms-new-product-form>
         <div class="products">
-            <dms-product *ngFor="let product of products | async" [@product]="product" [product]="product"></dms-product>
+            <dms-product
+                *ngFor="let product of products$ | async; trackBy: productId"
+                [product]="product"></dms-product>
         </div>
     `,
     styles: [`
@@ -28,11 +30,15 @@ import { Product } from './Product';
     `],
 })
 export class AppComponent {
-    public products: Observable<List<Product>>;
+    public products$: Observable<List<Product>>;
 
     constructor (private productRepository: ProductRepository) {
-        this.products = this.productRepository.fancyFindAll();
+        this.products$ = this.productRepository.fancyFindAll().concat(this.productRepository.productList$);
 
-        this.products.subscribe(null, null, () => console.log('complete'))
+        this.products$.subscribe(products => console.log(products), null, () => console.log('complete'));
+    }
+
+    public productId (index: number, product: Product): string {
+        return product.id;
     }
 }

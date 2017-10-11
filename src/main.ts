@@ -9,6 +9,7 @@ import 'rxjs/add/operator/concatMap';
 import 'rxjs/add/operator/switchMap';
 import 'rxjs/add/operator/delay';
 import 'rxjs/add/operator/scan';
+import 'rxjs/add/operator/concat';
 
 import { AppModule } from './app/app.module';
 import { environment } from './environments/environment';

@@ -30,7 +30,7 @@ import { Product } from './Product';
                 style({height: '*'})),
             state('unloaded',
                 style({height: 0})),
-            transition('unloaded => loaded', [animate('1000ms ease-in')]),
+            transition('unloaded => loaded', [animate('200ms ease-in')]),
         ])
     ]
 })

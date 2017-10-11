@@ -11,7 +11,6 @@ import { HttpFireBaseProductRepository, ProductRepository } from './ProductRepos
 import { NewProductFormComponent } from './newProductForm.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-console.log(ProductRepository, HttpFireBaseProductRepository)
 
 @NgModule({
     declarations: [
