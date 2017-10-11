@@ -14,7 +14,6 @@ export class NewProductFormComponent {
     constructor (private productRepository: ProductRepository) {}
 
     addProduct (product: Product) {
-        this.productRepository.add(product)
-            .subscribe(product => console.log(product));
+        this.productRepository.add(product).subscribe();
     }
 }
