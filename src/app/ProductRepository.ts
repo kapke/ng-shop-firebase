@@ -3,6 +3,7 @@ import { Http, RequestOptions, Headers } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 import { List } from 'immutable';
+import { AngularFireDatabase, AngularFireList, SnapshotAction } from 'angularfire2/database';
 
 import { Product } from './Product';
 
@@ -10,10 +11,9 @@ import { Product } from './Product';
 export abstract class ProductRepository {
     abstract productList$: Observable<List<Product>>;
 
-    abstract simpleFindAll (): Observable<List<Product>>;
-    abstract fancyFindAll (): Observable<List<Product>>;
+    abstract getAll (): Observable<List<Product>>;
     abstract add (product: Product): Observable<Product>;
-    abstract delete (product: Product): void;
+    abstract delete (product: Product): Observable<void>;
 }
 
 @Injectable()
@@ -24,20 +24,12 @@ export class HttpFireBaseProductRepository extends ProductRepository {
         super();
     }
 
-    simpleFindAll (): Observable<List<Product>> {
+    getAll (): Observable<List<Product>> {
         return this.http.get(this.getUrl())
             .map(res => res.json())
             .map(data => Object.keys(data)
                 .map(id => new Product({id, ...data[id]})))
             .map(List);
-    }
-
-    fancyFindAll (): Observable<List<Product>> {
-        return this.simpleFindAll()
-            .switchMap(products => Observable
-                .from(products.toArray())
-                .concatMap(product => Observable.of(product).delay(50)))
-            .scan((list: List<Product>, product: Product) => list.concat(product), List<Product>());
     }
 
     add (product: Product): Observable<Product> {
@@ -52,17 +44,48 @@ export class HttpFireBaseProductRepository extends ProductRepository {
             .do(() => this.emitNewProductList());
     }
 
-    delete (product: Product): void {
-        this.http.delete(this.getUrl(product.id))
-            .subscribe(() => this.emitNewProductList());
+    delete (product: Product): Observable<void> {
+        return this.http.delete(this.getUrl(product.id))
+            .mapTo(void 0)
+            .do(() => this.emitNewProductList());
     }
 
     private emitNewProductList (): void {
-        this.simpleFindAll().subscribe(products => this.productList$.next(products));
+        this.getAll().subscribe(products => this.productList$.next(products));
     }
 
     private getUrl (id?: string): string {
         const idPart = id ? '/' + id : '';
         return `https://shining-torch-4509.firebaseio.com/products${idPart}.json`;
+    }
+}
+
+@Injectable()
+export class FireBaseProductRepository extends ProductRepository {
+    private productList: AngularFireList<Product> = this.db.list('products');
+
+    productList$: Observable<List<Product>> = this.productList
+        .snapshotChanges()
+        .map(data => data
+            .filter(item => !!item)
+            .map(item => new Product({id: item!.payload!.key, ...item!.payload!.val()})))
+        .map(List);
+
+    constructor(private db: AngularFireDatabase) {
+        super();
+    }
+
+    getAll(): Observable<List<Product>> {
+        return this.productList$.take(1);
+    }
+
+    add(product: Product): Observable<Product> {
+        const data = {...product, id: undefined};
+
+        return Observable.fromPromise(this.productList.push(product));
+    }
+
+    delete(product: Product): Observable<void> {
+        return Observable.fromPromise<void>(this.productList.remove(product.id));
     }
 }

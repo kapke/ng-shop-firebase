@@ -47,8 +47,12 @@ import { MatSnackBar } from '@angular/material';
 export class AppComponent {
     public products$: Observable<List<Product>>;
 
-    constructor (snackBar: MatSnackBar, private productRepository: ProductRepository) {
-        this.products$ = this.productRepository.fancyFindAll()
+    constructor (private snackBar: MatSnackBar, private productRepository: ProductRepository) {
+        this.products$ = this.productRepository.getAll()
+            .switchMap(products => Observable
+                .from(products.toArray())
+                .concatMap(product => Observable.of(product).delay(50)))
+            .scan((list: List<Product>, product: Product) => list.concat(product), List<Product>())
             .catch((err): Observable<List<Product>> => {
                 snackBar.open(err.message || 'There was an error when fetching data');
                 return Observable.of<List<Product>>(List<Product>());
@@ -61,6 +65,10 @@ export class AppComponent {
     }
 
     public deleteProduct (product: Product): void {
-        this.productRepository.delete(product);
+        this.productRepository.delete(product)
+            .retry(5)
+            .subscribe(undefined, () => {
+                this.snackBar.open(`Unable to delete ${product.name}`, 'OK', {duration: 5000});
+            });
     }
 }

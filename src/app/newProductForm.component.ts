@@ -38,11 +38,11 @@ export class NewProductFormComponent {
                 .do(({count, message }) => {
                     const msg = message ? ': ' + message : '';
                     this.snackBar.open(
-                        `There was an error when trying to add a new product${msg}. ${count} tries left`,
+                        `There was an error when trying to add a new product${msg}. ${count} retries left`,
                         'OK',
-                        {duration: 1000},
+                        {duration: 5000},
                     );
                 }))
-            .subscribe(undefined, undefined, () => this.snackBar.open('Added new product!', 'OK', {duration: 1000}));
+            .subscribe(undefined, undefined, () => this.snackBar.open('Added new product!', 'OK', {duration: 5000}));
     }
 }

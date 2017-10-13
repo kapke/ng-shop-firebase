@@ -11,3 +11,7 @@ import 'rxjs/add/operator/mapTo';
 import 'rxjs/add/operator/scan';
 import 'rxjs/add/operator/switchMap';
 import 'rxjs/add/operator/retryWhen';
+import 'rxjs/add/operator/retry';
+import 'rxjs/add/observable/fromPromise';
+import 'rxjs/add/observable/empty';
+import 'rxjs/add/operator/take';
