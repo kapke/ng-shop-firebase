@@ -5,6 +5,7 @@ import { List } from 'immutable';
 import { ProductRepository } from './ProductRepository';
 import { Product } from './Product';
 import { trigger, state, style, transition, animate } from '@angular/animations';
+import { MatSnackBar } from '@angular/material';
 
 @Component({
     selector: 'dms-root',
@@ -46,8 +47,13 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
 export class AppComponent {
     public products$: Observable<List<Product>>;
 
-    constructor (private productRepository: ProductRepository) {
-        this.products$ = this.productRepository.fancyFindAll().concat(this.productRepository.productList$);
+    constructor (snackBar: MatSnackBar, private productRepository: ProductRepository) {
+        this.products$ = this.productRepository.fancyFindAll()
+            .catch((err): Observable<List<Product>> => {
+                snackBar.open(err.message || 'There was an error when fetching data');
+                return Observable.of<List<Product>>(List<Product>());
+            })
+            .concat(this.productRepository.productList$);
     }
 
     public productId (index: number, product: Product): string {
