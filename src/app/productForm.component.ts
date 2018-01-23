@@ -2,12 +2,14 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Product } from './Product';
+import { Subject } from 'rxjs/Subject';
+import 'rxjs/add/operator/filter';
 
 
 @Component({
     selector: 'dms-product-form',
     template: `
-        <form [formGroup]="form" (ngSubmit)="submitForm()">
+        <form [formGroup]="form" (ngSubmit)="formSubmitSubject.next()">
             <mat-input-container>
                 <label>Name</label>
                 <input matInput type="text" [formControlName]="'name'" />
@@ -32,6 +34,7 @@ export class ProductFormComponent {
     public form: FormGroup;
 
     @Output() formSubmit = new EventEmitter();
+    formSubmitSubject = new Subject();
 
     constructor (private formBuilder: FormBuilder) {
         this.form = formBuilder.group({
@@ -39,11 +42,10 @@ export class ProductFormComponent {
             price: ['', Validators.required],
             imageUrl: ['', Validators.required],
         });
-    }
 
-    public submitForm () {
-        if (this.form.valid) {
-            this.formSubmit.next(new Product(this.form.value));
-        }
+        this.formSubmitSubject
+            .filter(() => this.form.valid)
+            .map(() => this.form.value)
+            .subscribe(this.formSubmit);
     }
 }
