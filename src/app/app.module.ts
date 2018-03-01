@@ -5,14 +5,14 @@ import { HttpModule } from '@angular/http';
 import { MatInputModule, MatButtonModule, MatCardModule, MatSnackBarModule } from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AngularFireModule } from 'angularfire2';
-import { AngularFireDatabaseModule } from 'angularfire2/database';
+import { AngularFirestoreModule } from 'angularfire2/firestore';
 
 import { environment } from 'environments/environment';
 
 import { AppComponent } from './app.component';
 import { ProductComponent } from './product.component';
 import { ProductFormComponent } from './productForm.component';
-import { HttpFireBaseProductRepository, ProductRepository, FireBaseProductRepository } from './ProductRepository';
+import { ProductRepository, FireStoreProductRepository } from './ProductRepository';
 import { NewProductFormComponent } from './newProductForm.component';
 
 
@@ -34,9 +34,9 @@ import { NewProductFormComponent } from './newProductForm.component';
         MatCardModule,
         MatSnackBarModule,
         AngularFireModule.initializeApp(environment.firebase),
-        AngularFireDatabaseModule,
+        AngularFirestoreModule,
     ],
-    providers: [{provide: ProductRepository, useClass: FireBaseProductRepository}],
+    providers: [{provide: ProductRepository, useClass: FireStoreProductRepository}],
     bootstrap: [AppComponent]
 })
 export class AppModule {}

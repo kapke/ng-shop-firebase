@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Http, RequestOptions, Headers } from '@angular/http';
+import { AngularFirestore } from 'angularfire2/firestore';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 import { List } from 'immutable';
 import { AngularFireDatabase, AngularFireList, SnapshotAction } from 'angularfire2/database';
-import { map, tap, mapTo, take } from 'rxjs/operators';
+import { map, tap, mapTo, take, mergeMap } from 'rxjs/operators';
 import { fromPromise } from 'rxjs/observable/fromPromise';
 
 import { Product } from './Product';
@@ -90,10 +91,42 @@ export class FireBaseProductRepository extends ProductRepository {
     add(product: Product): Observable<Product> {
         const data = {...product, id: undefined};
 
-        return fromPromise(this.productList.push(product));
+        return fromPromise(this.productList.push(product).then(reference => new Product({...data, id: reference.key || ''})));
     }
 
     delete(product: Product): Observable<void> {
         return fromPromise<void>(this.productList.remove(product.id));
     }
+}
+
+@Injectable()
+export class FireStoreProductRepository extends ProductRepository {
+    private products = this.fs.collection<Product>('products');
+
+    public productList$ = this.products.valueChanges().pipe(
+        map(products => products.map(p => new Product(p))),
+        map(List)
+    );
+
+    constructor (private fs: AngularFirestore) {
+        super();
+    }
+
+    public add(product: Product): Observable<Product> {
+        return fromPromise(this.products.add(product)).pipe(
+            mergeMap(docRef => docRef.get()),
+            map(doc => doc.data()),
+            map(p => new Product(p || {}))
+        );
+    }
+
+    public delete(product: Product): Observable<void> {
+        return fromPromise(this.fs.doc(`products/${product.id}`).delete());
+    }
+
+    public getAll(): Observable<List<Product>> {
+        return this.productList$.pipe(take(1));
+    }
+
+
 }

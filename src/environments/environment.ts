@@ -6,11 +6,11 @@
 export const environment = {
     production: false,
     firebase: {
-        apiKey: 'AIzaSyAjT20F01p9v8_w5DqFg6ZCX8XAdRg5d4Y',
-        authDomain: 'shining-torch-4509.firebaseapp.com',
-        databaseURL: 'https://shining-torch-4509.firebaseio.com/',
-        projectId: 'shining-torch-4509',
-        storageBucket: 'shining-torch-4509.appspot.com',
-        messagingSenderId: '730123070766'
+        apiKey: 'AIzaSyD_-7D87cZ-zBxW_5lxV8AM8-xca1x0cXA',
+        authDomain: 'shop-firestore.firebaseapp.com',
+        databaseURL: 'https://shop-firestore.firebaseio.com',
+        projectId: 'shop-firestore',
+        storageBucket: 'shop-firestore.appspot.com',
+        messagingSenderId: '958519032806'
     }
 };
