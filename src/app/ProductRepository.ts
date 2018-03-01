@@ -9,6 +9,7 @@ import { map, tap, mapTo, take, mergeMap } from 'rxjs/operators';
 import { fromPromise } from 'rxjs/observable/fromPromise';
 
 import { Product } from './Product';
+import { DocumentSnapshot } from '@firebase/firestore-types';
 
 
 export abstract class ProductRepository {
@@ -103,9 +104,12 @@ export class FireBaseProductRepository extends ProductRepository {
 export class FireStoreProductRepository extends ProductRepository {
     private products = this.fs.collection<Product>('products');
 
-    public productList$ = this.products.valueChanges().pipe(
-        map(products => products.map(p => new Product(p))),
-        map(List)
+    public productList$ = this.products.snapshotChanges().pipe(
+        map(actions => actions
+            .map(a => a.payload.doc)
+            .map(this.documentToProduct)
+        ),
+        map(List),
     );
 
     constructor (private fs: AngularFirestore) {
@@ -115,8 +119,7 @@ export class FireStoreProductRepository extends ProductRepository {
     public add(product: Product): Observable<Product> {
         return fromPromise(this.products.add(product)).pipe(
             mergeMap(docRef => docRef.get()),
-            map(doc => doc.data()),
-            map(p => new Product(p || {}))
+            map(this.documentToProduct),
         );
     }
 
@@ -128,5 +131,5 @@ export class FireStoreProductRepository extends ProductRepository {
         return this.productList$.pipe(take(1));
     }
 
-
+    private documentToProduct = (doc: DocumentSnapshot): Product => new Product({...doc.data(), id: doc.id });
 }
