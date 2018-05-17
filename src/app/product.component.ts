@@ -39,7 +39,7 @@ import { Product } from './Product';
 })
 export class ProductComponent {
     public state: 'loaded'|'unloaded' = 'unloaded';
-    @Input() public product: Product;
+    @Input() public product!: Product;
 
     imageLoaded () {
         this.state = 'loaded';

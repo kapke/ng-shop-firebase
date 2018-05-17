@@ -1,8 +1,8 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { HttpModule } from '@angular/http';
-import { MatInputModule, MatButtonModule, MatCardModule, MatSnackBarModule } from '@angular/material';
+import { MatButtonModule, MatCardModule, MatSnackBarModule } from '@angular/material';
+import { MatInputModule} from '@angular/material/input';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AngularFireModule } from 'angularfire2';
 import { AngularFirestoreModule } from 'angularfire2/firestore';
@@ -28,7 +28,6 @@ import { NewProductFormComponent } from './newProductForm.component';
         BrowserModule,
         FormsModule,
         ReactiveFormsModule,
-        HttpModule,
         MatInputModule,
         MatButtonModule,
         MatCardModule,

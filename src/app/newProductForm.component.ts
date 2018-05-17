@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
 import { MatSnackBar } from '@angular/material';
-import { retryWhen, map, concatMap, scan, tap } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { concatMap, delay, map, retryWhen, scan, tap } from 'rxjs/operators';
 
 import { Product } from './Product';
 import { ProductRepository } from './ProductRepository';
@@ -29,7 +29,7 @@ export class NewProductFormComponent {
                             return '';
                         }
                     }),
-                    concatMap((err, index) => Observable.of(err).delay(1000 * 2 ** index)),
+                    concatMap((err, index) => of(err).pipe(delay(1000 * 2 ** index))),
                     scan<string, {count: number; message: string}>(({count}, message) => {
                         if (count === 0) {
                             throw message;

@@ -1,27 +1,25 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-
-import { Product } from './Product';
-import { Subject } from 'rxjs/Subject';
-import 'rxjs/add/operator/filter';
+import { Subject } from 'rxjs';
+import { filter, map } from 'rxjs/operators';
 
 
 @Component({
     selector: 'dms-product-form',
     template: `
         <form [formGroup]="form" (ngSubmit)="formSubmitSubject.next()">
-            <mat-input-container>
+            <mat-form-field>
                 <label>Name</label>
-                <input matInput type="text" [formControlName]="'name'" />
-            </mat-input-container>
-            <mat-input-container>
+                <input matInput type="text" [formControlName]="'name'"/>
+            </mat-form-field>
+            <mat-form-field>
                 <label>Price</label>
-                <input matInput type="number" min="0" [formControlName]="'price'" />
-            </mat-input-container>
-            <mat-input-container>
+                <input matInput type="number" min="0" [formControlName]="'price'"/>
+            </mat-form-field>
+            <mat-form-field>
                 <label>Image URL</label>
-                <input matInput type="url" [formControlName]="'imageUrl'" />
-            </mat-input-container>
+                <input matInput type="url" [formControlName]="'imageUrl'"/>
+            </mat-form-field>
             <div>
                 <button type="reset" mat-button>Reset</button>
                 <button type="submit" mat-button [disabled]="form.invalid">{{ submitButtonText }}</button>
@@ -36,7 +34,7 @@ export class ProductFormComponent {
     @Output() formSubmit = new EventEmitter();
     formSubmitSubject = new Subject();
 
-    constructor (private formBuilder: FormBuilder) {
+    constructor(private formBuilder: FormBuilder) {
         this.form = formBuilder.group({
             name: ['', Validators.required],
             price: ['', Validators.required],
@@ -44,8 +42,10 @@ export class ProductFormComponent {
         });
 
         this.formSubmitSubject
-            .filter(() => this.form.valid)
-            .map(() => this.form.value)
+            .pipe(
+                filter(() => this.form.valid),
+                map(() => this.form.value)
+            )
             .subscribe(this.formSubmit);
     }
 }

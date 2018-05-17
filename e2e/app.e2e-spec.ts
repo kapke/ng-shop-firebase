@@ -7,8 +7,8 @@ describe('ng-shop-firebase App', () => {
     page = new NgShopFirebasePage();
   });
 
-  it('should display message saying app works', () => {
+  it('should display message saying app works', async () => {
     page.navigateTo();
-    expect(page.getParagraphText()).toEqual('dms works!');
+    expect(await page.getParagraphText()).toEqual('dms works!');
   });
 });

@@ -1,20 +1,12 @@
+import { animate, state, style, transition, trigger } from '@angular/animations';
 import { Component } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
-import { List } from 'immutable';
 import { MatSnackBar } from '@angular/material';
-import {
-    trigger,
-    state,
-    style,
-    transition,
-    animate
-} from '@angular/animations';
-import { switchMap, scan, catchError, concat, concatMap, delay, retry } from 'rxjs/operators';
-import { from } from 'rxjs/observable/from';
-import { of } from 'rxjs/observable/of';
+import { List } from 'immutable';
+import { from, Observable, of } from 'rxjs';
+import { catchError, concat, concatMap, delay, retry, scan, switchMap } from 'rxjs/operators';
 
-import { ProductRepository } from './ProductRepository';
 import { Product } from './Product';
+import { ProductRepository } from './ProductRepository';
 
 @Component({
     selector: 'dms-root',
